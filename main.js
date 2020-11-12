@@ -1,26 +1,8 @@
-class Block {
-	constructor(x,y,number,element){
-		this.x=x;
-		this.y=y;
-		this.number=number;
-		this.element=element;
-		if (this.number==0) this.isEmpty=true;
-		else this.isEmpty=false;
-	}
-}
-const BlocksArray= {
-	blocks:[],
-	xNull:0,
-	yNull:0,
-	linkElement(){
-		elemets=document.querySelectorAll("block");
-		
-	}
-}
+
 const GemPuzzle = {
   properties: {
 	  sounds:true,
-	  size:4,
+	  size:3,
   },
   elements:{
 	  gameBoard:0,
@@ -29,8 +11,11 @@ const GemPuzzle = {
 	 isActive:false,
 	 counts:true,
 	 gameField:[],
+	 elementLinks:[],
 	 numOfSteps:0,
 	 time:0,
+	 nullX:0,
+	 nullY:0
   },
   initGameBoard(){
 	this.elements.gameBoard = document.createElement("div");
@@ -47,6 +32,7 @@ const GemPuzzle = {
 	if (this.checkShuffle(shuffled)){
 		for(let j=0;j<this.properties.size;j++){
 			this.instanceProperties.gameField.push(new Array(this.properties.size));
+			this.instanceProperties.elementLinks.push(new Array(this.properties.size));
 			for(let i=0;i<this.properties.size;i++){
 			  this.instanceProperties.gameField[j][i] = shuffled[(j*this.properties.size)+i];
 			}
@@ -70,19 +56,76 @@ const GemPuzzle = {
   initInstance(){
    this.shuffle();
    for(let j=0;j<this.properties.size;j++){
-	BlocksArray.blocks.push(new Array(this.properties.size));
 	for(let i=0;i<this.properties.size;i++){
 	  block = document.createElement("div");
 	  block.classList.add("block");
 	  block.innerText = this.instanceProperties.gameField[j][i]; 
+	  if (block.innerText==0){
+		block.classList.toggle("hide");
+		this.instanceProperties.nullX=i;
+		this.instanceProperties.nullY=j;
+	  }
 	  this.elements.gameBoard.appendChild(block.cloneNode(true));
-	  BlocksArray.blocks[j][i] = new Block(i,j,this.instanceProperties.gameField[j][i],block);
 	  }
 	}
 	this.updateInstance();
   },
   updateInstance(){
+	let blocks = document.querySelectorAll(".block");
+	blocks.forEach(el=>{
+		el.classList.remove("block_active");
+		el.removeEventListener("click",()=>{
+			this.swap(el)}
+		)
+	})
+	let nullX=this.instanceProperties.nullX;
+	let nullY=this.instanceProperties.nullY;
+	let arr = [];
+	if (nullX>0) arr.push(this.instanceProperties.gameField[nullY][nullX-1]);
+	if (nullX<(this.properties.size-1)) arr.push(this.instanceProperties.gameField[nullY][nullX+1]);
+	if (nullY>0) arr.push(this.instanceProperties.gameField[nullY-1][nullX]);
+	if (nullY<(this.properties.size-1)) arr.push(this.instanceProperties.gameField[nullY+1][nullX]);
+	blocks.forEach(el=>{
+		if (arr.includes(parseInt(el.innerText,10))) {
+			el.classList.add("block_active");
+			el.addEventListener("click",()=>{
+				this.swap(el)}
+			);
+		}
+	})
+	this.checkWin();
+  },
+  checkWin(){
+	let checker=[].concat.apply([],this.instanceProperties.gameField);
+	checker.splice(-1,1);
+	checker2=checker.join('');
+	checker1=checker.sort((a, b) => a - b).join('');
+	if (checker1==checker2) alert("win");
+  },
+  swap(el){
+	  if (el.classList.contains("block_active")){
+	  let x,y;
+	  for(let i=0; i<this.properties.size;i++){
+		  let index = this.instanceProperties.gameField[i].indexOf(parseInt(el.innerText,10))
+		  if (index!=-1){
+		   x=index;
+		   y=i;
+		   break;
+		}
+	  }
+	  let buff = this.instanceProperties.gameField[y][x];
+	  let nullEl=document.querySelector(".hide");
+	  nullEl.classList.remove("hide");
+	  el.classList.add("hide");
+	  nullEl.innerText=buff;
+	  el.innerText=0;
+	  this.instanceProperties.gameField[this.instanceProperties.nullY][this.instanceProperties.nullX] = buff;
+	  this.instanceProperties.gameField[y][x] = 0;
+	  this.instanceProperties.nullX=x;
+	  this.instanceProperties.nullY=y;
+	  this.updateInstance();
 	
+	}
   }
 
 }
@@ -139,7 +182,7 @@ const Menu = {
 		document.body.appendChild(this.elements.wrapperElement);
 	},
     toggleHide(){
-		this.elements.menuElement.classList.toggle("hide");
+		this.elements.menuElement.classList.toggle("hide_menu");
 	}
 }
 Menu.init();
