@@ -82,7 +82,7 @@ export const GemPuzzle = {
         block.innerText = this.instanceProperties.gameField[j][i];
         block.style.backgroundSize = `${this.elements.gameBoard.offsetWidth}px`;
         block.style.backgroundImage = this.instanceProperties.image;
-        block.style.backgroundPosition = `${(100 / this.properties.size) * (block.innerText % this.properties.size)}% ${(100 / this.properties.size) * Math.floor(block.innerText / this.properties.size)}%`;
+        block.style.backgroundPosition = `${(100 / this.properties.size) * ((block.innerText - 1) % this.properties.size)}% ${(100 / this.properties.size) * Math.floor((block.innerText - 1) / this.properties.size)}%`;
         if (this.instanceProperties.containImage) block.style.color = 'rgba(0, 0, 0, 0.0)';
         if (block.innerText === '0') {
           block.classList.toggle('hide');
