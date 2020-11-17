@@ -59,6 +59,10 @@ export const GemPuzzle = {
   },
   changeGameBoardSize() {
     this.elements.gameBoard.style.height = `${this.elements.gameBoard.offsetWidth}px`;
+    const blocks = document.querySelectorAll('.block');
+    blocks.forEach((el) => {
+      el.style.backgroundSize = `${this.elements.gameBoard.offsetWidth}px`;
+    });
   },
   initInstance() {
     this.elements.gameBoard = document.createElement('div');
@@ -82,7 +86,7 @@ export const GemPuzzle = {
         block.innerText = this.instanceProperties.gameField[j][i];
         block.style.backgroundSize = `${this.elements.gameBoard.offsetWidth}px`;
         block.style.backgroundImage = this.instanceProperties.image;
-        block.style.backgroundPosition = `${(100 / (this.properties.size - 1)) * ((block.innerText - 1) % this.properties.size)}% ${(100 / this.properties.size) * Math.floor((block.innerText - 1) / (this.properties.size - 1))}%`;
+        block.style.backgroundPosition = `${(100 / (this.properties.size - 1)) * ((block.innerText - 1) % this.properties.size)}% ${(100 / (this.properties.size - 1)) * Math.floor((block.innerText - 1) / this.properties.size)}%`;
         if (this.instanceProperties.containImage) block.style.color = 'rgba(0, 0, 0, 0.0)';
         if (block.innerText === '0') {
           block.classList.toggle('hide');
@@ -128,10 +132,10 @@ export const GemPuzzle = {
   },
   moveElement(element, xOffset, yOffset) {
     const nullEl = document.querySelector('.hide');
-    element.style.width = `${element.offsetWidth}px`;
-    element.style.height = `${element.offsetHeight}px`;
     const el = element.cloneNode(true);
     element.classList.toggle('hide');
+    el.style.width = `${element.offsetWidth}px`;
+    el.style.height = `${element.offsetHeight}px`;
     el.style.position = 'absolute';
     el.style.zIndex = 1000;
     el.style.transitionProperty = 'transform';
